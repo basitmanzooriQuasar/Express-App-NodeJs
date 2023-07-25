@@ -1,11 +1,25 @@
+const tok = localStorage.getItem("token");
+window.addEventListener("load", () => {
+  if (!localStorage.getItem("token")) {
+    window.location.replace("login.html");
+  }
+});
+
 // Fetch tasks from the API
-fetch("http://127.0.0.1:3000/api/v1/tasks")
+fetch("http://127.0.0.1:3000/api/v1/tasks", {
+  headers: {
+    "Content-Type": "application/json",
+    Authorization: "Bearer " + localStorage.getItem("token"),
+  },
+})
   .then((response) => response.json())
   .then((data) => {
     const taskList = document.getElementById("task-list");
-    console.log(data);
+
+    const showUsername = document.querySelector(".showUser");
+    showUsername.textContent = "Welcome! 👷‍♂️ " + data.data.user.name;
     // Iterate over the tasks and create HTML elements dynamically
-    data.data.forEach((task) => {
+    data.data.tasks.forEach((task) => {
       const card = document.createElement("div");
       const listItem = document.createElement("p");
       const descItem = document.createElement("span");
@@ -53,10 +67,12 @@ const addTask = async (task) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Authorization: "Bearer " + localStorage.getItem("token"),
     },
     body: JSON.stringify(task),
   });
   const data = await response.json();
+
   alert("Task added successfully");
 };
 
@@ -79,6 +95,10 @@ addTaskForm.addEventListener("submit", async (e) => {
 const deleteTask = async (taskId) => {
   const response = await fetch(`http://127.0.0.1:3000/api/v1/tasks/${taskId}`, {
     method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + localStorage.getItem("token"),
+    },
   });
   const data = await response.json();
 };
@@ -99,16 +119,23 @@ document.addEventListener("click", (e) => {
   if (e.target.classList.contains("editButton")) {
     editTaskModal.showModal();
     updatedTaskID = e.target.getAttribute("data-taskIdUpdate");
-    fetch(`http://127.0.0.1:3000/api/v1/tasks/${updatedTaskID}`)
+    fetch(`http://127.0.0.1:3000/api/v1/tasks/${updatedTaskID}`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+    })
       .then((response) => {
         return response.json();
       })
       .then((data) => {
-        editTaskModal.querySelector("#editTaskName").value = data.data.name;
+        console.log(data);
+        editTaskModal.querySelector("#editTaskName").value =
+          data.data.task.name;
         editTaskModal.querySelector("#editTaskDescription").value =
-          data.data.description;
+          data.data.task.description;
         editTaskModal.querySelector("#editTaskCompleted").checked =
-          data.data.completed;
+          data.data.task.completed;
       });
   }
 });
@@ -122,6 +149,7 @@ const updateTask = async (task) => {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("token"),
       },
       body: JSON.stringify(task),
     }
@@ -143,4 +171,15 @@ updateTaskForm.addEventListener("submit", async (e) => {
     completed: taskCompleted,
   };
   await updateTask(task);
+});
+
+//LOGOUT BUTTON
+const logoutButton = document.querySelector("#logout");
+
+logoutButton.addEventListener("click", async (e) => {
+  e.preventDefault();
+  localStorage.removeItem("token");
+  // console.log(localStorage.getItem("token"));
+  window.location.replace("login.html");
+  alert("User successfully logged out");
 });

@@ -81,10 +81,30 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 450px;
+  height: 550px;
   margin: 5rem;
   flex-direction: column;
   background-color: #57c5b6;
   box-shadow: 2px 2px 5px rgb(172, 172, 172);
   border-radius: 4px;
+}
+
+#logout {
+  background-color: rgb(51, 219, 219);
+  border: 1px solid black;
+  border-radius: 3px;
+  box-shadow: 1px 1px 5px rgba(0, 0, 0);
+}
+
+#logout:hover {
+  background-color: aqua;
+}
+
+/* SHOW USERNAME */
+.showUser {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 22px;
+  padding: 10px;
 }
